@@ -1,20 +1,16 @@
+import { useYtVideoStore } from '@/store';
 import { isUrl } from '@/validators';
-import { useState } from 'react';
 
 export const useYoutubeSearch = () => {
-  const [youtubeCover, setYoutubeCover] = useState({
-    src: 'https://blog.rincondelvago.com/wp-content/themes/publisher/images/default-thumb/publisher-lg.png',
-    alt: 'Youtube Cover',
-    videoTitle: 'Here will be your video title',
-    videoDuration: 'Here will be your video duration',
-  });
+  const metaInfo = useYtVideoStore((state) => state.metaInfo);
+  const setMetaInfo = useYtVideoStore((state) => state.setMetaInfo);
 
   const handleSearch = async (url: string) => {
-    const isValidUrl = isUrl(url);
+    const isSameUrl = metaInfo.url === url;
+    if (isSameUrl || !url) return;
 
-    if (!isValidUrl) {
-      return;
-    }
+    const isValidUrl = isUrl(url);
+    if (!isValidUrl) return;
 
     try {
       const response = await fetch(
@@ -23,11 +19,11 @@ export const useYoutubeSearch = () => {
         })}`
       );
       const data = await response.json();
-      setYoutubeCover(data);
+      setMetaInfo(data);
     } catch (error) {
       console.error('Search API error: ', error);
     }
   };
 
-  return { youtubeCover, handleSearch };
+  return { metaInfo, handleSearch };
 };

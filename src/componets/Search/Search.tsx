@@ -1,20 +1,21 @@
 'use client';
 
-import { YoutubeCover } from './YoutubeCover';
-import { Button } from './ui/Button';
-import { FormField } from './ui/FormField';
-import { Input } from './ui/Input';
+import { Button } from '@/componets/ui/Button';
+import { FormField } from '@/componets//ui/FormField';
+import { Input } from '@/componets/ui/Input';
 import { useInput, useYoutubeSearch } from '@/hooks';
 
-export const SearchVideo = () => {
+import { YoutubeCover } from './components/YoutubeCover/YoutubeCover';
+
+export const Search = () => {
   const { value, handleType } = useInput();
-  const { youtubeCover, handleSearch } = useYoutubeSearch();
+  const { metaInfo, handleSearch } = useYoutubeSearch();
 
   return (
-    <div className="max-w-md mx-auto p-5 flex flex-col gap-5">
+    <div className="max-w-md mx-auto p-5 flex flex-col gap-5 justify-center">
       <FormField
         htmlFor="search_input"
-        labelText={<span className="text-lg">Youtube Mixer</span>}
+        labelText={<span className="text-md">Youtube Search</span>}
       >
         <div className="flex gap-5">
           <Input
@@ -28,7 +29,7 @@ export const SearchVideo = () => {
       </FormField>
 
       <div>
-        <YoutubeCover {...youtubeCover} />
+        <YoutubeCover {...metaInfo} />
       </div>
     </div>
   );
