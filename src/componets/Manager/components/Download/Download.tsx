@@ -1,10 +1,10 @@
-import { Button } from '@/componets/ui/Button';
 import { Select } from '@/componets/ui/Select';
 import { useState } from 'react';
 import { DownloadTable } from './DownloadTable';
+import { TExtension } from '@/helpers/ytdl';
 
 export const Download = () => {
-  const [type, setType] = useState('MP4');
+  const [extension, setExtension] = useState<TExtension>('mp4');
 
   return (
     <div className="flex flex-col gap-7">
@@ -12,13 +12,16 @@ export const Download = () => {
         <label htmlFor="countries" className="block mb-2 text-sm font-medium">
           Extension:
         </label>
-        <Select value={type} onChange={(e) => setType(e.target.value)}>
-          <Select.Option value="MP4">MP4</Select.Option>
-          <Select.Option value="MP3">MP3</Select.Option>
+        <Select
+          value={extension}
+          onChange={(e) => setExtension(e.target.value as TExtension)}
+        >
+          <Select.Option value="mp4">MP4</Select.Option>
+          <Select.Option value="mp3">MP3</Select.Option>
         </Select>
       </div>
 
-      <DownloadTable />
+      <DownloadTable extension={extension} />
     </div>
   );
 };

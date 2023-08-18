@@ -1,3 +1,6 @@
+import ytdl from 'ytdl-core';
+import { TExtension } from './ytdl';
+
 /**
  * Template to format time element
  * @param value
@@ -23,4 +26,9 @@ export const getTimeFormatBySeconds = (seconds: number) => {
   const ss = template(rest);
 
   return `${hh}:${mm}:${ss}`;
+};
+
+export const contentTypeByExtension = {
+  mp3: 'audio/mpeg',
+  mp4: 'application/force-download',
 };

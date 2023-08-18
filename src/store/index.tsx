@@ -1,3 +1,4 @@
+import { IDownloadYt } from '@/helpers/ytdl';
 import { create } from 'zustand';
 
 export interface IYtVideoStore {
@@ -8,7 +9,8 @@ export interface IYtVideoStore {
     videoDuration: string;
     url: string;
     formats: {
-      quality: string;
+      quality: IDownloadYt['qualityLabel'];
+      qualityType: string;
       size: number;
       url: string;
     }[];

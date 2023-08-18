@@ -1,3 +1,5 @@
+const webpack = require('webpack'); // eslint-disable-line
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -21,6 +23,14 @@ const nextConfig = {
         pathname: '/vi_webp/**',
       },
     ],
+  },
+  webpack(cfg) {
+    cfg.plugins.push(
+      new webpack.DefinePlugin({
+        'process.env.FLUENTFFMPEG_COV': false,
+      })
+    );
+    return cfg;
   },
 };
 
