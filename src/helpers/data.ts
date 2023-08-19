@@ -1,5 +1,5 @@
+import { INiceFormat, TExtension, TFormatsGrouped } from '@/types/conversion';
 import ytdl from 'ytdl-core';
-import { TExtension } from './ytdl';
 
 /**
  * Template to format time element
@@ -28,7 +28,31 @@ export const getTimeFormatBySeconds = (seconds: number) => {
   return `${hh}:${mm}:${ss}`;
 };
 
-export const contentTypeByExtension = {
-  mp3: 'audio/mpeg',
-  mp4: 'application/force-download',
+export const audioEquivalents = {
+  AUDIO_QUALITY_LOW: 'Quality Low',
+  AUDIO_QUALITY_MEDIUM: 'Quality Medium',
 };
+
+export const filterByExtension = (format: ytdl.videoFormat, itag: number) => ({
+  mp3: format.hasAudio && !format.hasVideo && format.itag === itag,
+  mp4: format.hasAudio && format.hasVideo && format.itag === itag,
+  mp4WithoutAudio: !format.hasAudio && format.hasVideo && format.itag === itag,
+});
+
+export const transformToNiceFormat = (
+  format: ytdl.videoFormat
+): INiceFormat => ({
+  audioQuality: format.audioQuality,
+  videoQuality: format.qualityLabel,
+  itag: format.itag,
+  size: format.contentLength
+    ? (+format.contentLength / 1024 / 1024).toFixed(2)
+    : undefined,
+  url: format.url,
+});
+
+export const extensionEquivalents: Record<TFormatsGrouped,TExtension> = {
+  mp3: "mp3",
+  mp4: "mp4",
+  mp4WithoutAudio: "mp4"
+}

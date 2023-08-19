@@ -2,29 +2,35 @@ import ytdl from 'ytdl-core';
 import internal from 'node:stream';
 import fs from 'fs';
 import { streamToMp3, streamToMp4 } from './streams';
-
-export type TExtension = 'mp4' | 'mp3';
+import { extensionEquivalents, filterByExtension } from './data';
+import { TFormatsGrouped, TGetStream } from '@/types/conversion';
 
 export const getYtInfo = async (ytUrl: string) => {
   const response = await ytdl.getInfo(ytUrl);
   return response;
 };
 
-const getStream = ({
+const filterYTDLVideo =
+  (moreOptions: Omit<TGetStream, 'ytUrl'>) => (format: ytdl.videoFormat) => {
+    const match = filterByExtension(format, moreOptions.itag)[
+      moreOptions.extension
+    ];
+
+    return match;
+  };
+
+export const getStream = ({
   ytUrl,
-  qualityLabel,
-  extension,
-}: IDownloadYt): Promise<internal.Readable> => {
-  const buffer: Array<any> = [];
+  ...moreOptions
+}: TGetStream): Promise<internal.Readable> => {
   //Ref: https://nodejs.org/api/stream.html#class-streamreadable
   return new Promise((resolve, reject) => {
     const ytVideoInternalReadable = ytdl(ytUrl, {
-      quality: 'highest',
-      filter: (format: ytdl.videoFormat) => {
-        const match = format.qualityLabel === qualityLabel;
+      filter: filterYTDLVideo(moreOptions),
+    });
 
-        return match;
-      },
+    ytVideoInternalReadable.on('error', (error) => {
+      reject(Error('Error getting yt video: ' + error.message));
     });
 
     ytVideoInternalReadable.on(
@@ -32,9 +38,10 @@ const getStream = ({
       (chunkLength, downloaded, total) => {}
     );
 
+    const validExtension = extensionEquivalents[moreOptions.extension];
     ytVideoInternalReadable.pipe(
       fs
-        .createWriteStream('sample.' + extension)
+        .createWriteStream('sample.' + validExtension)
         .on('open', () => {
           console.log('Downloading Video');
         })
@@ -43,23 +50,18 @@ const getStream = ({
           resolve(ytVideoInternalReadable);
         })
         .on('error', async (error) => {
-          reject('Error getting stream first part: ' + error.message);
+          reject(Error('Error getting stream first part: ' + error.message));
         })
     );
   });
 };
 
-const getFFMPEGContentStream = async (extension: TExtension) => {
+export const getFFMPEGContentStream = async (extension: TFormatsGrouped) => {
   if (extension === 'mp3') return await streamToMp3();
   return await streamToMp4();
 };
 
-export interface IDownloadYt {
-  ytUrl: string;
-  qualityLabel: ytdl.videoFormat['qualityLabel'];
-  extension: TExtension;
-}
-export const downloadYt = async (options: IDownloadYt) => {
+export const downloadYt = async (options: TGetStream) => {
   await getStream(options);
   const finalStream = await getFFMPEGContentStream(options.extension);
 

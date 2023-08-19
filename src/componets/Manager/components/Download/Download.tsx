@@ -1,10 +1,10 @@
 import { Select } from '@/componets/ui/Select';
 import { useState } from 'react';
 import { DownloadTable } from './DownloadTable';
-import { TExtension } from '@/helpers/ytdl';
+import { TExtension, TFormatsGrouped } from '@/types/conversion';
 
 export const Download = () => {
-  const [extension, setExtension] = useState<TExtension>('mp4');
+  const [extension, setExtension] = useState<TFormatsGrouped>('mp4');
 
   return (
     <div className="flex flex-col gap-7">
@@ -18,6 +18,7 @@ export const Download = () => {
         >
           <Select.Option value="mp4">MP4</Select.Option>
           <Select.Option value="mp3">MP3</Select.Option>
+          <Select.Option value="mp4WithoutAudio">MP4 Without Audio</Select.Option>
         </Select>
       </div>
 

@@ -10,9 +10,10 @@ export const streamFile = (
 
   return new ReadableStream({
     start(controller) {
-      downloadStream.on('data', (chunk: Buffer) =>
-        controller.enqueue(new Uint8Array(chunk))
-      );
+      downloadStream.on('data', (chunk: Buffer) => {
+        console.log('progress', chunk);
+        controller.enqueue(new Uint8Array(chunk));
+      });
       downloadStream.on('end', () => controller.close());
       downloadStream.on('error', (error: NodeJS.ErrnoException) =>
         controller.error(error)
@@ -30,14 +31,12 @@ export const streamToMp3 = async (): Promise<fs.WriteStream> => {
 
     ffmpeg('sample.mp3')
       .output('downloadedFile.mp3')
-      .on('progress', (progress) => {
-        console.log('FFMPEG Progress: ', progress);
-      })
+      .on('progress', (progress) => {})
       .on('end', () => {
         console.log('FFMPEG Conversion completed');
         return resolve(outputStream);
       })
-      .on('err', (err) => {
+      .on('error', (err) => {
         return reject(err);
       })
       .run();
@@ -50,14 +49,12 @@ export const streamToMp4 = async (): Promise<fs.WriteStream> => {
 
     ffmpeg('sample.mp4')
       .output('downloadedFile.mp4')
-      .on('progress', (progress) => {
-        console.log('FFMPEG Progress: ', progress);
-      })
+      .on('progress', (progress) => {})
       .on('end', () => {
         console.log('FFMPEG Conversion completed');
         return resolve(outputStream);
       })
-      .on('err', (err) => {
+      .on('error', (err) => {
         return reject(err);
       })
       .run();
